@@ -1,16 +1,26 @@
-# 2-D radial flow problem for CO2 injection into a saline aquifer (Frio rock)
+# 2-D radial (but 3D cylindrical) flow problem for CO2 injection into a saline aquifer (TEMPORARILY)
 ROCKS----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
-SAND1    2  2600.000      .340 2.264E-12  2.264-12  2.264-13     2.510   920.000
+ROCK1    2  2600.000      .005 2.264E-12  2.264-12  2.264-13     2.510   920.000
   2.10E-09                           0.5
     7           .457       .30        1.       .05
     7           .457       .00    5.1e-5      1.e7      .999
  
 MULTI----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
-    3    3    3    6
+    3    4    3    6
+! KN NOTE - NK number of mass components.(Water, NaCl, CO2)
+! KN NOTE - NEQ number of balance equations per grid block. Usually we have NEQ = NK + 1, for solving NK mass and one energy balance equation. Some EOS modules allow the option NEQ = NK, in which case only NK mass balances and no energy equation will be solved. 
+! KN NOTE - PROBLEM 6 HAD NEQ=3, But we set NEQ=4 meaning we consider NON-ISOTERMAL!!
+! KN NOTE - NPH number of phases that can be present (2 for most EOS modules). (Aqueous (Liquid), Gas (Supercritical CO2), and Solid (Precipitated Salt).)
+! KN NOTE - NB number of secondary parameters in the PAR-array (see Fig. 3) other than component mass fractions. Available options include NB = 6 (no diffusion) and NB = 8 (include diffusion).
+! KN NOTE - NKIN number of mass components in INCON data (default is NKIN = NK). ... SKIP ...
+
 SELEC....2....3....4....5....6....7....8....9...10...11...12...13...14...15...16
     1                                            0    0    0    0    0    0    1
         .8   .8
      ..... IE(16) = 2 chooses CO2, = 3 is for methane.
+! KN NOTE - Comments from TOUGH2 Manual: SELECTION (optional) introduces a number of integer and floating point parameters that are used for different purposes in different TOUGH2 modules (EOS7, EOS7R, EWASG, T2DM).IE(1) number of records with floating point numbers that will be read (default is IE(1) = 1; maximum values is 64).
+! KN NOTE - For ECO2N model, The above IE(1 to 16) is correct. IE(16)=1 treats the background gas as AIR/Nitrogen.
+! KN NOTE - [.8   .8] indicates FE(1) and FE(2) - in ECO2N, they control Tortuosity or Diffusion factor
 SOLVR----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
 5  Z1   O0    8.0e-1    1.0e-7
 START----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
@@ -46,53 +56,3 @@ AK  1inj 4                   3     COM3h            .538E+05
       .538E+05      .538E+05      .538E+05
  
 ENDCY----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
-
-
-
-INCON----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
-
-
-MESHMAKER1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
-RZ2D
-RADII
-    1
-        0.
-EQUID
-    1            1.0
-LOGAR
-   15           1.E2
-LOGAR
-   20           1.E3
-LOGAR
-   15           1.E4
-LOGAR
-    5           1.E5
-LAYER----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
-   20
-       2.0       2.0       2.0       2.0       2.0       2.0       2.0       2.0
-       2.0       2.0       2.0       2.0       2.0       2.0       2.0       2.0
-       2.0       2.0       2.0       2.0       2.0       2.0       2.0       2.0
-
-ENDFI----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
-
-
-
-MESHMAKER1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
-RZ2D
-RADII
-    1
-        0.
-EQUID
-    1             .3
-LOGAR
-   15           1.E2
-LOGAR
-   15           1.E4
-LOGAR
-    5           1.E5
-LAYER----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8
-   10
-       10.      10.0      10.0      10.0      10.0      10.0      10.0      10.0
-     10.0       10.0       
-
-

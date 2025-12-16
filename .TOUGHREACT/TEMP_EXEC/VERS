@@ -13,25 +13,23 @@
                                                using H2O-CO2 phase partitioning according to Spycher and Pruess, TiPM 2010 (high T)
       HALITE   1.0      25 FEBRUARY  1993      EQUILIBRIUM HALITE SOLUBILITY
 
-      PVTCX    2.1      25 April     2008      H2O-CO2 phase partitioning for brines to high T (Nic Spycher, LBNL);
+      PVTCX    1.1      08 October       2013      H2O-CO2 phase partitioning for brines (Nic Spycher, LBNL)
                                                output mass fractions (K.P.)
-      SAT      1.0 S    17 SEPTEMBER 1990      STEAM TABLE EQUATION: SATURATION PRESSURE AS FUNCTION OF TEMPERATURE (M. OS.)
-      DHAL     1.0      11 MARCH     1996      HALITE DENSITY AS FUNCTION OF T AND P
 
-      GasMixProp 1.0   12 September     2014      thermoproperties of H2O-CO2 mixture in CO2-rich phase
-
+      FUGA     1.1      08 October       2013      calculate H2O-CO2 fugacity coefficients (Nic Spycher, LBNL)
       NCG      1.1x     27 August    2014      SPECIFIC ENTHALPY, DENSITY, AND VISCOSITY OF GASEOUS CO2(matching NIST,LP)
-      SUPST    1.0 S     1 February  1991      VAPOR DENSITY AND INTERNAL ENERGY AS FUNCTION OF TEMPERATURE AND PRESSURE (M. OS.)
-      VISS     1.0      22 JANUARY   1990      VISCOSITY OF VAPOR AS FUNCTION OF TEMPERATURE AND PRESSURE
-      COWAT    1.0 S    17 SEPTEMBER 1990      LIQUID WATER DENSITY AND INT. ENERGY VERSUS TEMPERATURE AND PRESSURE (M. OS.)
-      VISW     1.0      22 JANUARY   1990      VISCOSITY OF LIQUID WATER AS FUNCTION OF TEMPERATURE AND PRESSURE
 
-      GasMixVisc 1.0    29 July     2014      Viscosity of H2O-CO2 mixture (T.A. Davidson 1993, RI 9456)
+      YH2O     1.0       8 August    2005      calculate H2O and CO2 mol fractions (Nic Spycher, LBNL)
 
+      CALC_GAM 1.0      16 February  2005      calculate CO2 activity coefficient (Nic Spycher, LBNL)
+      DHAL     1.0      11 MARCH     1996      HALITE DENSITY AS FUNCTION OF T AND P
+      SAT      1.0 S    17 SEPTEMBER 1990      STEAM TABLE EQUATION: SATURATION PRESSURE AS FUNCTION OF TEMPERATURE (M. OS.)
       SATB     1.0      26 MARCH     1992      VAPOR PRESSURE OF BRINE AS FUNCTION OF T, P AND SALT MASS FRACTION
       COBRI    1.0       2 February  2014      DENSITY AND ENTHALPY OF LIQUID BRINE AS FUNCTION OF T, P AND SALT MASS FRACTION
                                                choose brine enthalpy correlation by IE(15); default is Lorenz et al. (2000)
+      COWAT    1.0 S    17 SEPTEMBER 1990      LIQUID WATER DENSITY AND INT. ENERGY VERSUS TEMPERATURE AND PRESSURE (M. OS.)
       TCRIT    1.0       5 November  1999      CRITICAL T OF NACL SOLUTIONS AS A FUNCTION OF SALINITY
+      BRINEN   1.0       5 October   2000      DEVIATION OF BRINE ENTHALPY vs. T AND SALT MASS FRACTION after Lorenz et al.
       MOVO     1.0      25 March     2005      molar volume of dissolved CO2 after J. Garcia, LBNL-49023
       VISB     1.1       2 June      2005      VISCOSITY OF BRINE AS FUNCTION OF T, P AND SALT MASS FRACTION
       VISH2O   1.0      22 MARCH     1996      VISCOSITY OF LIQUID WATER OR VAPOR AS FUNCTION OF TEMPERATURE, PRESSURE AND DENSITY (ASME, 1977)
@@ -74,11 +72,37 @@
       THCOND   1.00     29 DECEMBER  2014      CALCULATE THERMAL CONDUCTIVITY FOR BRINE/CO2 MIXTURES
       LINEQ    2.00      4 October   1999      Interface for linear equation solvers T2CG2
                                                Can call a direct solver or a package of conjugate gradient solvers
+      CONVER2  2.1      28 August  2014      UPDATE PRIMARY VARIABLES AFTER CONVERGENCE IS ACHIEVED   /(Used when coupled with reactive geochemistry)
+      COUPLE    2.4    27 March    2019      COUPLE TRANSPORT WITH REACTION (els and ns changes)
+      WRITE_PLOT   3.8   23 May 2019      Write variables vs. block for species, minerals and gases
+      WRITE_TIME_ECO2 2.1 17 September 2013      Write variables vs. time for species, minerals and gases
+      MATRIXC_IMPLICIT    2.4     27 Jan 2016      ASSEMBLE MATRIX FOR SOLUTE TRANSPORT
+      DIFFUSION_LHS    1.0     16 Dec 2015      LHS DIFFUSION MATRIX TERM FOR SOLUTE TRANSPORT
+      LINEQC    2.10    08 October    2013      Interface for linear equation solvers T2CG2
+                                               Can call a direct solver or a package of conjugate gradient solvers
+      DRY_MAP    2.1     12 September 2013      Map dry-out grid blocks 
+      rsfarea  2.2      14 January 2014      Calculate reactive surface area
+      newtoneq 3.3       28 Jan  2016      Solve equations of chemical system by Newton-raphson
+      chemeq       2.3  6 Apr  2016      Computes chemical parameters at each NR iteration
+      chemeq       2.3  6 Apr  2016      Computes chemical parameters at each NR iteration
+      rate_species 2.1  17 September  2013      Calculate part of rate constant contributed from dependent species
+      rate_species 2.1  17 September  2013      Calculate part of rate constant contributed from dependent species
+      rate_species 2.1  17 September  2013      Calculate part of rate constant contributed from dependent species
+      cmq_cp   4.0     05 April  2016      Calculate saturation indexes of minerals and gases
+      rate_species 2.1  17 September  2013      Calculate part of rate constant contributed from dependent species
+      rate_species 2.1  17 September  2013      Calculate part of rate constant contributed from dependent species
+      cr_cp    2.5      19 January  2019      Calculate mineral reaction rates and their derivatives
+      jacobeq  2.2      6 April  2016      Construct Jacobian matrix for chemical system
+      DRY_MIN    3.0     25 November 2015      Calculate mineral precipitation at dry grid blocks 
+      phichg   2.4     21 August  2015      Calculate porosity changes from mineralprecipitation/dissolution
+      permchg  2.3      1 June  2015      Calculate permeability changes due to mineral dis./prec.
+      COMPUTE_MASS 3.0   12 April 2016      Compute mass input to and output from the system
+      CONVER3  2.2      11 May    2017      Adjust timestep for reactive transport
       RELP     1.11      30 November   2015      LIQUID AND GAS PHASE RELATIVE PERMEABILITIES AS FUNCTIONS OF SATURATION
                                                for IRP=7, use Corey-krg when RP(4).ne.0, with Sgr = RP(4)
-      PSCO2    1.0      21 October   2003      CALCULATE CO2 SATURATION PRESSURE AS FUNCTION OF TEMPERATURE
       MTRXIN   1.1      10 September 2000      Routine for Z-preprocessing of the Jacobian
-      VISGAS   1.1       8 August    2005      VISCOSITY OF CO2 AS FUNCTION OF TEMPERATURE AND PRESSURE
-      CO2SAT   1.0       8 August    2002      interpolate CO2 properties along saturation line
       WRIFI    1.2      30 November   2015      AT THE COMPLETION OF A TOUGH2 RUN, WRITE PRIMARY VARIABLES ON FILE *SAVE*
       WRITE_RESTART 2.1  17 September 2013      Write restart data for reactive chemical transport
+      VISGAS   1.1       8 August    2005      VISCOSITY OF CO2 AS FUNCTION OF TEMPERATURE AND PRESSURE
+      WRITE_MASS   2.2   25 November 2015      Write mass input to and output from the system
+      Waterchem  2.1   10 February   2015      Write chemical speciation in chemical.inp format

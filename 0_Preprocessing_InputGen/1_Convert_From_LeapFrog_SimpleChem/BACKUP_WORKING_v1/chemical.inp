@@ -1,0 +1,69 @@
+# Title
+Deep Sky Thetford: Asterisk Format
+#-----------------------------------------------------------------------------
+# DEFINITION OF THE GEOCHEMICAL SYSTEM
+# PRIMARY AQUEOUS SPECIES
+h2o                     0
+h+                      0
+na+                     0
+k+                      0
+ca+2                    0
+mg+2                    0
+hco3-                   0
+so4-2                   0
+cl-                     0
+sio2(aq)                0
+alo2-                   0
+fe+2                    0
+o2(aq)                  0
+*
+# AQUEOUS KINETICS
+*
+# AQUEOUS COMPLEXES
+*
+# MINERALS
+*
+# GASES
+co2(g)                  0
+*
+# SURFACE COMPLEXES
+*
+# species with Kd and decay    decay constant(1/s)
+*
+# EXCHANGEABLE CATIONS
+*
+#-----------------------------------------------------------------------------
+# INITIAL AND BOUNDARY WATER TYPES
+1   0
+# Index  Speciation T(C)  P(bar)
+1          15.0            1.013
+#         icon        guess         ctot
+h2o               1      1.000E+00      1.000E+00   *  0.
+h+                1      1.000E-07      1.000E-07   *  0.
+na+               1      1.000E-01      1.000E-01   *  0.
+k+                1      1.000E-10      1.000E-10   *  0.
+ca+2              1      1.000E-10      1.000E-10   *  0.
+mg+2              1      1.000E-10      1.000E-10   *  0.
+hco3-             1      1.000E-10      1.000E-10   *  0.
+so4-2             1      1.000E-10      1.000E-10   *  0.
+cl-               1      1.000E-01      1.000E-01   *  0.
+sio2(aq)          1      1.000E-10      1.000E-10   *  0.
+alo2-             1      1.000E-10      1.000E-10   *  0.
+fe+2              1      1.000E-10      1.000E-10   *  0.
+o2(aq)            1      1.000E-10      1.000E-10   *  0.
+*
+# INITIAL MINERAL ZONES
+1
+1
+*
+# INITIAL gas ZONES
+*
+# Permeability-Porosity Zones
+*
+# INITIAL SURFACE ADSORPTION ZONES
+*
+# INITIAL LINEAR EQUILIBRIUM Kd ZONE
+*
+# INITIAL ZONES OF CATION EXCHANGE
+*
+# end

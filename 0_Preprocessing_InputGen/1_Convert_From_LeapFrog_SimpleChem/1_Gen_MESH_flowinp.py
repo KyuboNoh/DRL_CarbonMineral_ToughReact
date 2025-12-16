@@ -1,200 +1,118 @@
 import os
 import sys
-import math
 
 """
 ===============================================================================
-TOUGHREACT INPUT CONVERTER (v24: PARAM PHYSICS FIX)
+TOUGHREACT INPUT GENERATOR (Exact User Specification)
 ===============================================================================
-THE PROBLEM FOUND:
-1. DELTMX (Max Time Step) was 1.0E-05. This forced the simulator to take 
-   microsecond steps, making it impossible to reach 100 years.
-2. PARAM Alignment was 8-char wide. TOUGH reads 5-char wide.
-   It read MCYC (Max Cycles) as "5" instead of "4000".
 
-THE FIX:
-1. Set DELTMX to 1.0E+08 (Allow large time steps).
-2. Set PARAM integers to strict 5-char width.
+WARNING: THIS SCRIPT GENERATES INPUTS WITH KNOWN RISK FACTORS
+The output 'flow.inp' strictly follows the user-provided template. 
+Please be aware of the following potential issues in this format:
+
+1. PARAM BLOCK:
+   - DELTEN = -1.0: This forces Manual Time Stepping (Table Lookup). 
+     It requires the extra line " 1." (DLT) immediately following.
+     If the simulation exceeds the provided table, it may struggle to 
+     auto-step effectively compared to DELTEN > 0.
+   - KDATA = 10: This increases printout frequency significantly (printing 
+     at every Newton iteration if improperly combined with other flags).
+   - MOP(16) = 6: This is a very strict doubling criterion (convergence in 
+     <6 iterations). Standard is 4. This may slow down the run.
+
+2. GENER BLOCK:
+   - "COM3h": This text is placed in columns 31-40. Standard TOUGH2 expects 
+     a FLOAT (Enthalpy) here. "COM3h" may cause "Input Conversion Errors" 
+     depending on the specific compiler/version of TOUGHREACT.
+   - Merged Name ("i 4INJ01"): The Element name and Source name are 
+     running together. This risks the simulator searching for a non-existent 
+     block named "i 4I" instead of "i 4".
+   - Wrapped Table Data: The time/rate data is formatted with 3 floats per 
+     line. Standard TOUGH input expects specific Time/Rate pairs. 
+     This format relies on the Fortran reader handling wrapped lines, 
+     which is often unstable.
+
 ===============================================================================
 """
 
 # =============================================================================
-# --- USER CONFIGURATION (EDIT HERE) ---
+# --- USER CONFIGURATION ---
 # =============================================================================
 
 INPUT_DIR   = "INPUT"
 OUTPUT_DIR  = "OUTPUT"
 SOURCE_FILE = "example_model.dat"
 
-# --- TIMING CONFIGURATION (IN YEARS) ---
-INJ_DURATION_YRS = 10.0    # Inject for 10 Years
-MONITOR_END_YRS  = 100.0   # Continue simulation until 100 Years
-
-# Output Frequency (How often to write to disk)
-OUTPUT_FREQ_INJ  = 2.0     # Every 2 years during injection
-OUTPUT_FREQ_MON  = 20.0    # Every 20 years after injection
-
-# --- PHYSICS CONSTANTS ---
-SEC_PER_YEAR = 3.15576e7  # Standard Julian year seconds
-P_SURFACE = 1.013e5   
-T_SURFACE = 15.0      
-GRAD_T    = 0.03      
-RHO_W     = 1000.0    
-SALINITY  = 0.1       
-
-# --- INJECTION PARAMETERS ---
+# --- INJECTION SETTINGS ---
+# Note: These values populate the specific fields in the user's template
 INJ_X     = 319000.0  
 INJ_Y     = 5100900.0 
 INJ_Z     = 1000.0    
-INJ_RATE  = 5.0       
-INJ_ENTHALPY = 0.538E+05  # Enthalpy (matches working snippet)
-INJ_COMP     = "COM3h"    
-
-# --- CHEMISTRY CONFIG ---
-NUM_COMPS    = 13
-NUM_MINERALS = 4
-NUM_AQUEOUS  = 13
+INJ_RATE  = 1.0       
+INJ_ENTHALPY_STR = ".538E+05" # Kept as string to match format exactly
 
 # =============================================================================
 # --- INTERNAL LOGIC ---
 # =============================================================================
 
 INPUT_PATH  = os.path.join(INPUT_DIR, SOURCE_FILE)
-MESH_OUT    = os.path.join(OUTPUT_DIR, "MESH")
 FLOW_OUT    = os.path.join(OUTPUT_DIR, "flow.inp")
-INCON_OUT   = os.path.join(OUTPUT_DIR, "INCON")
-SOLUTE_OUT  = os.path.join(OUTPUT_DIR, "solute.inp")
-
+MESH_OUT    = os.path.join(OUTPUT_DIR, "MESH") # Generated just for context
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-def generate_time_schedule(inj_dur, end_time, step_inj, step_mon):
-    """Generates a list of output times in seconds based on yearly inputs."""
-    times = []
-    current_t = 0.0
-    
-    # Phase 1: Injection (0 to 10 years)
-    while current_t < inj_dur - 1e-5:
-        current_t += step_inj
-        if current_t > inj_dur: current_t = inj_dur
-        times.append(current_t * SEC_PER_YEAR)
-        
-    # Phase 2: Monitoring (10 to 100 years)
-    while current_t < end_time - 1e-5:
-        current_t += step_mon
-        if current_t > end_time: current_t = end_time
-        times.append(current_t * SEC_PER_YEAR)
-        
-    return sorted(list(set(times)))
-
-def fmt_10char(val_str):
-    try:
-        val = float(val_str)
-        if val == -1.0: return "       -1."
-        if val == 0.0:  return "        0."
-        s = f"{val:.3E}"
-        if len(s) > 10: s = s.replace("E+0", "E").replace("E+", "E")
-        return f"{s:>10}"
-    except ValueError:
-        return f"{val_str:>10}"
 
 def parse_blocks(filename):
     if not os.path.exists(filename):
-        raise FileNotFoundError(f"Input file not found: {filename}")
-    with open(filename, 'r') as f:
-        lines = f.readlines()
-    blocks = {}
-    current_block = None
-    buffer = []
+        print(f"Warning: Input file {filename} not found. Using default logic."); return {}
+    with open(filename, 'r') as f: lines = f.readlines()
+    blocks = {}; current = None; buffer = []
     keywords = ["ROCKS", "PARAM", "ELEME", "CONNE", "GENER", "INCON", "SOLVR", "MULTI", "SELEC", "START", "ENDCY"]
     for line in lines:
-        stripped = line.strip()
-        if not stripped: continue
-        is_keyword = False
+        s = line.strip()
+        if not s: continue
+        is_key = False
         for k in keywords:
-            if stripped.startswith(k):
-                if current_block: blocks[current_block] = buffer
-                current_block = k
-                buffer = []
-                is_keyword = True
-                break
-        if not is_keyword and current_block:
-            buffer.append(line)
-    if current_block: blocks[current_block] = buffer
+            if s.startswith(k):
+                if current: blocks[current] = buffer
+                current = k; buffer = []; is_key = True; break
+        if not is_key and current: buffer.append(line)
+    if current: blocks[current] = buffer
     return blocks
 
 print(f"--- Processing {INPUT_PATH} ---")
-try:
-    data = parse_blocks(INPUT_PATH)
-except FileNotFoundError as e:
-    print(f"Error: {e}"); sys.exit(1)
+data = parse_blocks(INPUT_PATH)
 
 # ==========================================
 # 0. FIND INJECTOR
 # ==========================================
-elements = []
-z_values = [] 
+injector_elem = " i 4 " # Default fallback from your snippet
 min_dist_sq = 1.0e20
-injector_elem = None
 
 if 'ELEME' in data:
     for line in data['ELEME']:
         if len(line) < 80: continue
         try:
             name = line[0:5] 
-            x = float(line[50:60])
-            y = float(line[60:70])
-            z = float(line[70:80])
-            elements.append(name)
-            z_values.append(z)
+            x, y, z = float(line[50:60]), float(line[60:70]), float(line[70:80])
             dist_sq = (x - INJ_X)**2 + (y - INJ_Y)**2 + (z - INJ_Z)**2
             if dist_sq < min_dist_sq:
                 min_dist_sq = dist_sq
                 injector_elem = name
         except ValueError: continue
 
-if injector_elem:
-    print(f" -> FOUND: Injector assigned to '{injector_elem}'")
+if injector_elem != " i 4 ":
+    print(f" -> FOUND: Nearest element is '{injector_elem}'. Using this name.")
 
 # ==========================================
-# 1. GENERATE MESH
-# ==========================================
-print(f"Generating {MESH_OUT}...")
-with open(MESH_OUT, 'w', newline='\n') as f:
-    if 'ELEME' in data:
-        f.write("ELEME----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
-        for line in data['ELEME']: f.write(line)
-        f.write("\n")
-    if 'CONNE' in data:
-        f.write("CONNE----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
-        for line in data['CONNE']: f.write(line)
-        f.write("\n")
-
-# ==========================================
-# 2. GENERATE FLOW.INP
+# 1. GENERATE FLOW.INP (EXACT FORMAT)
 # ==========================================
 print(f"Generating {FLOW_OUT}...")
 with open(FLOW_OUT, 'w', newline='\n') as f:
-    f.write("TOUGHREACT 3D: Fixed PARAM Physics\n")
+    f.write("TOUGHREACT 3D: Fixed GENER Alignment\n")
     
     # ROCKS
     if 'ROCKS' in data:
         f.write("ROCKS----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
-        for line in data['ROCKS']:
-            if len(line) < 10: continue
-            try:
-                name = line[0:5].strip()
-                den = float(line[10:20].strip())
-                por = float(line[20:30].strip())
-                p1 = float(line[30:40].strip())
-                p2 = float(line[40:50].strip())
-                p3 = float(line[50:60].strip())
-                cond = float(line[60:70].strip())
-                cp = float(line[70:80].strip())
-                f.write(f"{name:<5}{2:>5}{den:10.3f}{por:10.3f}{p1:10.2E}{p2:10.2E}{p3:10.2E}{cond:10.3f}{cp:10.3f}\n")
-                f.write("  1.00E-09                           0.5\n")
-                f.write("    7           .457       .30        1.       .05\n")
-                f.write("    7           .457       .00    5.1e-5      1.e7      .999\n")
-            except: f.write(line)
+        for line in data['ROCKS']: f.write(line)
         f.write("\n")
 
     # MULTI
@@ -202,11 +120,8 @@ with open(FLOW_OUT, 'w', newline='\n') as f:
     f.write("    3    3    3    6\n") 
 
     f.write("SELEC....2....3....4....5....6....7....8....9...10...11...12...13...14...15...16\n")
-    if 'SELEC' in data:
-        for line in data['SELEC']: f.write(line)
-    else:
-        f.write("    1                                      0    0    0    0    0    0    1\n")
-        f.write("       0.8       0.8\n")
+    f.write("    1                                      0    0    0    0    0    0    1\n")
+    f.write("       0.8       0.8\n")
 
     f.write("SOLVR----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
     f.write("5  Z1  O0    8.0e-1     1.0e-7\n")
@@ -216,107 +131,52 @@ with open(FLOW_OUT, 'w', newline='\n') as f:
     f.write("00021004\n")
     f.write("----*----1 MOP: 123456789*123456789*1234 ---*----5----*----6----*----7----*----8\n")
     
-    # --- PARAM BLOCK (PHYSICS FIX) ---
+    # --- PARAM BLOCK (EXACT USER REQUEST) ---
     f.write("PARAM----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
     
-    # Line 1: Strict 5-char columns (MCYC = 4000)
-    # {8:>5} prevents it from being read as "   8" in the wrong column
-    mop_str = "00000010  4   0500" 
-    line1 = f"{8:>5}{50:>5}{4000:>5}{0:>5}{mop_str}"
-    f.write(line1 + "\n")
+    # Line 1: KDATA=10, MCYC=9999, MOP(16)=6 (The problematic settings requested)
+    f.write("     20 10               9999          0          000000000012000060120500\n")
     
-    # Line 2: DELTMX (4th Val) must be LARGE (1.0e8), NOT 1.0e-5
-    t_max_sec = MONITOR_END_YRS * SEC_PER_YEAR
-    #                TSTART(Blank)   TMAX           DELTEN(-1.)    DELTMX(1.0E8)
-    line2 = f"          {fmt_10char(t_max_sec)}{fmt_10char(-1.0)}{fmt_10char(1.0e8)}A1 50 0.01      9.81"
-    f.write(line2 + "\n")
+    # Line 2: DELTEN = -1.0
+    f.write(" 0.000E+00 3.156E+09       -1.0 1.000E+05                  9.81 \n")
     
-    f.write(" 1.\n 1.E-4     1.E00\n             200.e5               .06               1.e-12               75.\n")
+    # Line 3: The Manual DLT Step (Required when DELTEN is negative)
+    f.write(" 1.\n")
+    
+    # Line 4 & 5
+    f.write(" 1.E-4     1.E00\n")
+    f.write("             200.e5               .06               1.e-12               75.\n")
     
     # TIMES
-    time_list = generate_time_schedule(INJ_DURATION_YRS, MONITOR_END_YRS, OUTPUT_FREQ_INJ, OUTPUT_FREQ_MON)
     f.write("TIMES----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
-    f.write(f"{len(time_list):>5}\n")
-    for i, t in enumerate(time_list):
-        f.write(fmt_10char(t))
-        if (i + 1) % 8 == 0: f.write("\n")
-    if len(time_list) % 8 != 0: f.write("\n")
+    f.write("2\n")
+    f.write(" 3.156E+06 3.156E+07\n")
 
-    # GENER (PRESERVED EXACT FORMAT)
+    # GENER (EXACT USER FORMAT)
     f.write("GENER----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
-    if injector_elem:
-        
-        t_pulse_end = INJ_DURATION_YRS * SEC_PER_YEAR
-        t_far_future = (MONITOR_END_YRS * 10) * SEC_PER_YEAR
-        
-        elem_s = f"{injector_elem:<5}"
-        header = f"{elem_s}INJ01{' '*19}3{' '*5}{INJ_COMP:<5}{' '*13}{INJ_ENTHALPY:8.3E}"
-        f.write(header + "\n")
-        
-        fval = lambda v: f"{v:14.5E}".replace("E+", "E") if v > 1e10 else f"{v:14.5E}"
-        
-        t1 = fval(0.0)
-        t2 = fval(t_pulse_end)
-        t3 = fval(t_far_future)
-        f.write(f"    {t1}   {t2}    {t3}\n")
-        
-        r1 = f"           {INJ_RATE:<3.1f}" 
-        r2 = fval(0.0)
-        r3 = fval(0.0)
-        f.write(f"{r1}{r2}{r3}\n")
-        
-        h_val = ".538E+05"
-        f.write(f"      {h_val}      {h_val}      {h_val}\n")
-        
+    
+    # Formatting the merged header: " i 4INJ01" 
+    # {injector_elem.strip()} ensures we don't have too many spaces if the name is short
+    # We construct it to look exactly like the snippet provided.
+    elem_str = injector_elem.rstrip() # " i 4"
+    if len(elem_str) < 5: elem_str = f"{elem_str:<4}" # Ensure at least length 4 for look
+    
+    # Line 1: Header with "COM3h"
+    f.write(f" {elem_str}INJ01                   3     COM3h            {INJ_ENTHALPY_STR}        \n")
+    
+    # Line 2: 3 floats (Time, Rate, Time)
+    # 0.0, 1.0, 3.15569E6
+    f.write("    0.0000E+00   1.0000E+00    3.15569E6\n")
+    
+    # Line 3: 3 floats (Rate, Time, Rate)
+    # 1.0, 3.15569E6, 0.0
+    f.write("    1.0000E+00   3.15569E6     0.0000E+00\n")
+    
+    # Line 4: 2 floats (Time, Rate)
+    # 3.15569E6, 0.0
+    f.write("    3.15569E6    0.0000E+00\n")
+
     f.write("\n")
     f.write("ENDCY\n")
 
-# ==========================================
-# 3. GENERATE INCON
-# ==========================================
-print(f"Generating {INCON_OUT}...")
-if z_values:
-    max_z = max(z_values)
-    with open(INCON_OUT, 'w', newline='\n') as f:
-        f.write("INCON----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
-        for i, name in enumerate(elements):
-            depth = max(0, max_z - z_values[i])
-            p = P_SURFACE + (RHO_W * 9.81 * depth)
-            t = T_SURFACE + (GRAD_T * depth)
-            f.write(f"{name:<5}    0\n")
-            f.write(f"{p:20.14E}{SALINITY:20.14E} 0.0000000000000E+00{t:20.14E}\n")
-        f.write("\n")
-
-# ==========================================
-# 4. GENERATE SOLUTE.INP
-# ==========================================
-print(f"Generating {SOLUTE_OUT}...")
-with open(SOLUTE_OUT, 'w', newline='\n') as f:
-    f.write("# Title\n'TOUGHREACT 3D CO2 Injection'\n")
-    f.write("#ISPIA,itersfa,ISOLVC,NGAMM,NGAS1,ichdump,kcpl,Ico2h2o,nu\n")
-    f.write(f"{2:>5}{0:>5}{5:>5}{1:>5}{1:>5}{0:>5}{1:>5}{0:>5}{0:>5}\n")
-    f.write("#constraints for chemical solver\n   1.00e-5   0.000     6.0     1.0\n")
-    f.write("#Read input and output file names:\n")
-    f.write("TherAkin10.dat                 ! thermodynamic database\n")
-    f.write("iter.out                       ! iteration information\n")
-    f.write("co2d_conc.tec                  ! aqueous concentrations\n")
-    f.write("co2d_min.tec                   ! mineral data\n")
-    f.write("co2d_gas.tec                   ! gas data\n")
-    f.write("co2d_tim.out                   ! time concentrations\n")
-    f.write("#Weighting parameters\n       1.0       1.0   1.0d-09   1.1d-05\n")
-    f.write("#data to convergence criteria:\n    1 0.100E-03  200 0.100E-05 0.100E-07  0.00E-05  0.00E-05\n")
-    f.write(f"#NWTI NWNOD NWCOM NWMIN NWAQ NWADS NWEXC iconflag minflag  igasflag\n")
-    f.write(f"{100:>5}{0:>5}{NUM_COMPS:>5}{NUM_MINERALS:>5}{NUM_AQUEOUS:>5}{0:>5}{0:>5}{0:>5}{1:>5}{1:>5}\n")
-    f.write("#pointer of nodes for writing in time:\n\n")
-    f.write("#pointer of components:\n")
-    f.write("  ".join(str(i) for i in range(1, NUM_COMPS + 1)) + "\n")
-    f.write("#pointer of minerals:\n")
-    f.write("  ".join(str(i) for i in range(1, NUM_MINERALS + 1)) + "\n")
-    f.write("#Individual aqueous species:\n")
-    f.write("  ".join(str(i) for i in range(1, NUM_AQUEOUS + 1)) + "\n")
-    f.write("#Adsorption species:\n\n#Exchange species:\n\n")
-    f.write("#IZIWDF ... (default zones)\n    1    1    1    1    0    0    1    0    0\n")
-    f.write("#ELEM(a5) ... (specific nodes)\n\n")
-    f.write("# end record\nend\n")
-
-print(f"Done. Files created in '{OUTPUT_DIR}'.")
+print(f"Done. Exact 'flow.inp' created in '{OUTPUT_DIR}'.")
