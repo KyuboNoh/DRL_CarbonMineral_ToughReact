@@ -1,0 +1,38 @@
+# Title
+'2-D CO2' 
+#ISPIA,itersfa,ISOLVC,NGAMM,NGAS1,ichdump,kcpl,Ico2h2o,nu
+    2    0       5      1    1       0     1      0    0    
+#constraints for chemical solver:  sl1min, rcour, stimax, cnfact
+   1.00e-5   0.000     6.0     1.0
+#Read input and output file names:
+TherAkin10.dat                  ! thermodynamic database
+iter.out                        ! iteration information
+co2d_conc.tec                   ! aqueous concentrations in tecplot form
+co2d_min.tec                    ! mineral data  in tecplot form
+co2d_gas.tec                    ! gas data  in tecplot form
+co2d_tim.out                       ! concentrations at specific elements over time
+#Weighting parameters
+       1.0       1.0   1.0d-09   1.1d-05           ! itime wupc,dffun,dffung
+#data to convergence criteria:
+    1 0.100E-03  200 0.100E-05 0.100E-07  0.00E-05  0.00E-05    !  ........ TOLDC,TOLDR 
+#NWTI NWNOD NWCOM NWMIN NWAQ NWADS NWEXC iconflag minflag  igasflag
+   100    1   11   17    1    0      0       0      1          1
+#pointer of nodes for writing in time:
+A1 10
+#pointer of components for writing:
+    3    4    5    6    7    8    9   10   11   12   13
+#pointer of minerals for writing:
+    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17
+#Individual aqueous species for which to output concentrations in time and plot files:
+   32
+#Adsorption species for which to output concentrations in time and plot files:
+
+#Exchange species for which to output concentrations in time and plot files:
+
+#IZIWDF IZBWDF IZMIDF IZGSDF IZADDF IZEXDF IZPPDF IZKDDF IZBGDF (default types of chemical zones)
+    1    1    1    1    0    0    1    0    0  
+#ELEM(a5) NSEQ NADD IZIW IZBW IZMI IZGS IZAD IZEX izpp IZKD IZBG (types of chemical zones for specific nodes)
+
+# this "end" record is needed now
+end 
+

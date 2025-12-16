@@ -1,0 +1,139 @@
+  TOUGHREACT V4.13omp : runlog.out
+ 
+  ---> start reading solute.inp
+  ---> finished reading solute.inp 
+
+ --> start reading chemical input data from chemical.inp
+
+
+     Temporarily stop reading chemical.inp to read thermodynamic database....
+    --> Start reading thermodynamic database: TherAkin10.dat      
+ 
+  --- List of all possible aqueous complexes --- 
+          (o-phth)-2          
+          acetic~acid(aq)     
+          acetate             
+          acetone(aq)         
+          benzene(aq)         
+          clo4-               
+          co2(aq)             
+          co3-2               
+          ethane(aq)          
+          fe+3                
+          h2(aq)              
+          methane(aq)         
+          ch4(aq)             
+          methanol(aq)        
+          oh-                 
+          so3-2               
+          al(oh)2+            
+          al(oh)3(aq)         
+          al(oh)4-            
+          al(so4)2-           
+          al13o4(oh)24(7+)    
+          al2(oh)2+4          
+          al3(oh)4(5+)        
+          aloh+2              
+          halo2(aq)           
+          al+3                
+          naalo2(aq)          
+          also4+              
+          ca(h3sio4)2(aq)     
+          cacl+               
+          cacl2(aq)           
+          caco3(aq)           
+          cah2sio4(aq)        
+          cah3sio4+           
+          cahco3+             
+          caoh+               
+          caso4(aq)           
+          clo-                
+          clo2-               
+          clo3-               
+          fe(oh)2(aq)         
+          fe(oh)2+            
+          fe(oh)3(aq)         
+          fe(oh)3-            
+          fe(oh)4-            
+          fe(so4)2-           
+          fe2(oh)2+4          
+          fe3(oh)4(5+)        
+          fecl+               
+          fecl+2              
+          fecl2(aq)           
+          fecl2+              
+          fecl4-              
+          fecl4-2             
+          feco3(aq)           
+          feco3+              
+          fehco3+             
+          fehso4+2            
+          feo(aq)             
+          feoh+               
+          feoh+2              
+          feso4(aq)           
+          feso4+              
+          hs-                 
+          h2s(aq)             
+          h2sio4-2            
+          h2so4(aq)           
+          h3sio4-             
+          h4(h2sio4)4-4       
+          h6(h2sio4)4-2       
+          hcl(aq)             
+          hclo(aq)            
+          hclo2(aq)           
+          hfeo2-              
+          ho2-                
+          hs2o3-              
+          hsio3-              
+          hso3-               
+          hso4-               
+          hso5-               
+          kcl(aq)             
+          khso4(aq)           
+          koh(aq)             
+          kso4-               
+          mg(h3sio4)2(aq)     
+          mg4(oh)4+4          
+          mgcl+               
+          mgco3(aq)           
+          mgh2sio4(aq)        
+          mgh3sio4+           
+          mghco3+             
+          mgoh+               
+          mgso4(aq)           
+          nacl(aq)            
+          naco3-              
+          nah3sio4(aq)        
+          nahco3(aq)          
+          nahsio3(aq)         
+          naoh(aq)            
+          naso4-              
+          s-2                 
+          s2-2                
+          s2o3-2              
+          s2o4-2              
+          s2o5-2              
+          s2o6-2              
+          s2o8-2              
+          s3-2                
+          s3o6-2              
+          s4-2                
+          s4o6-2              
+          s5-2                
+          s5o6-2              
+          so2(aq)             
+ 
+   Mineral       Molar volume (liters/mol)
+  
+    --> Finished reading thermodynamic database
+     ....back to reading chemical.inp
+
+
+  --> Finished reading chemical.inp file
+
+
+  ...running...
+     see output file: iter.out             for time and time step information
+

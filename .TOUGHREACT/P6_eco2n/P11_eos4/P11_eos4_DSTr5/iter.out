@@ -1,0 +1,63 @@
+                   TOUGHREACT V4.13omp EOS  4
+
+          ---- Modelling Progress and Iteration Messages ----
+
+ Description of column-headers and variables:
+   TIMESTEP = Total number of timesteps
+   TIME     = Total simulation time (seconds and years)
+   ITFLO    = Iterations to solve flow
+   ITSQ     = Sequential transport-chemistry iterations
+   MXITCH   = Maximum iterations to solve chemistry
+   AVITCH   = Average iterations to solve chemistry
+   Dt(s)    = Current time step (seconds)
+   Dt-LIMIT = Criterion limiting timestep
+   MXITCH-ID = Grid block: maximum chemical iterations
+
+ TIMESTEP     TIME(s)       TIME(y)  ITFLO ITSQ MXITCH AVITCH    Dt(s)      Dt-LIMIT     MXITCH-ID
+ ----------------------------------------------------------------------------------------------------
+        0  0.000000E+00  0.000000E+00   0   0    47   47.000  0.00000E+00      ---           InWat
+        1  1.000000E+01  3.168879E-07   3   1     7    4.494  1.00000E+01      ---           m 754
+        2  3.000000E+01  9.506637E-07   3   1     4    2.954  2.00000E+01  Chem_iter0_dtinc  f 985
+        3  7.000000E+01  2.218215E-06   3   1     4    2.957  4.00000E+01  Chem_iter0_dtinc  f 985
+        4  1.500000E+02  4.753319E-06   2   1     4    2.498  8.00000E+01  Chem_iter0_dtinc  fc003
+        5  3.100000E+02  9.823525E-06   3   1     4    2.510  1.60000E+02  Chem_iter0_dtinc  f 754
+        6  6.300000E+02  1.996394E-05   3   1     4    2.514  3.20000E+02  Chem_iter0_dtinc  f 186
+        7  1.270000E+03  4.024476E-05   3   1     4    2.524  6.40000E+02  Chem_iter0_dtinc  f  22
+        8  2.550000E+03  8.080642E-05   3   1     4    2.530  1.28000E+03  Chem_iter0_dtinc  f  22
+        9  5.110000E+03  1.619297E-04   3   1     4    2.530  2.56000E+03  Chem_iter0_dtinc  f  22
+       10  1.023000E+04  3.241763E-04   4   1     4    2.526  5.12000E+03  Chem_iter0_dtinc  f  22
+       11  2.047000E+04  6.486695E-04   4   1     4    2.534  1.02400E+04  Chem_iter0_dtinc  f   5
+       12  4.095000E+04  1.297656E-03   4   1     4    2.930  2.04800E+04  Chem_iter0_dtinc  f   5
+       13  8.191000E+04  2.595629E-03   4   1     4    2.820  4.09600E+04  Chem_iter0_dtinc  f   5
+       14  1.638300E+05  5.191575E-03   4   1     4    2.735  8.19200E+04  Chem_iter0_dtinc  f   9
+       15  2.502300E+05  7.929486E-03   4   1     4    2.980  8.64000E+04  Max_Delta_t       f2239
+       16  3.366300E+05  1.066740E-02   4   1     3    2.975  8.64000E+04  Max_Delta_t       f   5
+       17  4.230300E+05  1.340531E-02   4   1     3    2.976  8.64000E+04  Max_Delta_t       f   5
+       18  5.094300E+05  1.614322E-02   4   1     3    2.975  8.64000E+04  Max_Delta_t       f   5
+       19  5.958300E+05  1.888113E-02   4   1     3    2.967  8.64000E+04  Max_Delta_t       f   5
+       20  6.822300E+05  2.161904E-02   4   1     3    2.963  8.64000E+04  Max_Delta_t       f   5
+       40  2.410230E+06  7.637727E-02   4   1     3    2.204  8.64000E+04  Max_Delta_t       m   5
+       60  4.138230E+06  1.311355E-01   4   1     3    2.513  8.64000E+04  Max_Delta_t       f   5
+       80  5.866230E+06  1.858937E-01   3   1     3    2.479  8.64000E+04  Max_Delta_t       f   5
+      100  7.594230E+06  2.406520E-01   4   1     3    2.248  8.64000E+04  Max_Delta_t       f   5
+      120  9.322230E+06  2.954102E-01   3   1     3    2.251  8.64000E+04  Max_Delta_t       f   5
+      140  1.105023E+07  3.501684E-01   3   1     3    2.262  8.64000E+04  Max_Delta_t       f   5
+      160  1.277823E+07  4.049267E-01   3   1     3    2.266  8.64000E+04  Max_Delta_t       f   5
+      180  1.450623E+07  4.596849E-01   3   1     3    2.269  8.64000E+04  Max_Delta_t       f   5
+      200  1.623423E+07  5.144431E-01   3   1     3    2.273  8.64000E+04  Max_Delta_t       f   5
+      220  1.796223E+07  5.692013E-01   3   1     3    2.282  8.64000E+04  Max_Delta_t       f   5
+      240  1.969023E+07  6.239596E-01   3   1     3    2.288  8.64000E+04  Max_Delta_t       f   5
+      260  2.141823E+07  6.787178E-01   3   1     3    2.294  8.64000E+04  Max_Delta_t       f   5
+      280  2.314623E+07  7.334760E-01   3   1     3    2.298  8.64000E+04  Max_Delta_t       f   5
+      300  2.487423E+07  7.882343E-01   4   1     8    3.437  8.64000E+04  Max_Delta_t       f   5
+      320  2.660223E+07  8.429925E-01   4   1     5    3.501  8.64000E+04  Max_Delta_t       f1143
+      340  2.787663E+07  8.833767E-01   4   1    15    2.709  2.16000E+04  Flow_dtcut        f1138
+      360  2.919423E+07  9.251298E-01   5   1    15    3.179  2.16000E+04  Flow_dtcut        f1364
+      380  2.969643E+07  9.410440E-01   6   1    14    2.915  2.16000E+04  Flow_dtcut        f1358
+      400  3.012843E+07  9.547335E-01   5   1    13    2.762  2.16000E+04  Flow_dtcut        f1081
+      420  3.062523E+07  9.704765E-01   6   1    15    3.039  4.32000E+04  Flow_dtcut        f1098
+      440  3.148923E+07  9.978556E-01   5   1    13    2.873  4.32000E+04  Flow_dtcut        f 996
+      442  3.155690E+07  1.000000E+00   5   1     8    2.943  2.44700E+04  Tot_time_Dt       f1043
+ 
+        Total number of chemical iterations =     5125995
+  ...done! TOUGHREACT V4.13omp   simulation finished

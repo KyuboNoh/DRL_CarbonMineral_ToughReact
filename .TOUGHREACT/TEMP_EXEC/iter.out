@@ -1,0 +1,18 @@
+                   TOUGHREACT V4.13omp EOS 14
+
+          ---- Modelling Progress and Iteration Messages ----
+
+ Description of column-headers and variables:
+   TIMESTEP = Total number of timesteps
+   TIME     = Total simulation time (seconds and years)
+   ITFLO    = Iterations to solve flow
+   ITSQ     = Sequential transport-chemistry iterations
+   MXITCH   = Maximum iterations to solve chemistry
+   AVITCH   = Average iterations to solve chemistry
+   Dt(s)    = Current time step (seconds)
+   Dt-LIMIT = Criterion limiting timestep
+   MXITCH-ID = Grid block: maximum chemical iterations
+
+ TIMESTEP     TIME(s)       TIME(y)  ITFLO ITSQ MXITCH AVITCH    Dt(s)      Dt-LIMIT     MXITCH-ID
+ ----------------------------------------------------------------------------------------------------
+        0  0.000000E+00  0.000000E+00   0   0    26   26.000  0.00000E+00      ---           InWat

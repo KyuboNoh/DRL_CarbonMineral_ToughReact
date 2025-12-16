@@ -1,0 +1,92 @@
+import os
+
+OUTPUT_FILE = "flow.inp"
+
+# --- USER CONFIGURATION ---
+ROCK_NAME = "dfalt" # Restoring User Name (Mixed case might work, or use dfalt)
+DENSITY   = 2600.0
+POROSITY  = 0.10
+PERM      = 1.0e-13
+COND      = 2.51
+SP_HEAT   = 920.0
+INJ_BLOCK = "A3M65"
+INJ_RATE  = 1.0
+
+# --- HELPER: STRICT 10-CHAR FORMATTER ---
+def fmt_10char(val):
+    if val == -1.0: return "       -1."
+    if val == 0.0: return "        0."
+    # Use 3 decimals -> 9 chars -> 10 chars with pad to prevent touching
+    s = f"{val:.3E}" 
+    if len(s) > 10: s = s.replace("E+0", "E").replace("E+", "E")
+    return f"{s:>10}"
+
+print(f"--- Generating {OUTPUT_FILE} with GOLDEN ROCKS ---")
+
+with open(OUTPUT_FILE, 'w', newline='\n') as f:
+    f.write("TOUGHREACT 3D: Test Manual ROCKS\n")
+
+    f.write("ROCKS----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
+    # Verified Logic:
+    # Name(5) + 4spaces + "2" (Index)
+    # Density: 10.3f (2600.000)
+    # Porosity: 10.3f (0.100)
+    # Perms: 10.2E (1.00E-13) -> 8 chars + 2 space padding
+    line1 = f"{ROCK_NAME:<5}    2{DENSITY:10.3f}{POROSITY:10.3f}" \
+            f"{PERM:10.2E}{PERM:10.2E}{1.0e-14:10.2E}{COND:10.3f}{SP_HEAT:10.3f}"
+    f.write(line1 + "\n")
+    
+    # Line 2: Compressibility (Matches Manual spacing exactly)
+    f.write("  1.00E-09                           0.5\n")
+    
+    # Line 3: Relative Perm (Model 7 from Manual)
+    f.write("    7           .457       .30        1.       .05\n")
+    
+    # Line 4: Capillary Press (Model 7 from Manual)
+    f.write("    7           .457       .00    5.1e-5      1.e7      .999\n")
+    
+    f.write("\n") 
+
+    f.write("MULTI----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
+    f.write("    3    3    3    6\n")
+
+    f.write("SELEC....2....3....4....5....6....7....8....9...10...11...12...13...14...15...16\n")
+    f.write("    1                                      0    0    0    0    0    0    1\n")
+    f.write("       0.8       0.8\n")
+
+    f.write("SOLVR----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
+    f.write("5  Z1  O0    8.0e-1     1.0e-7\n")
+
+    f.write("START----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
+
+    f.write("REACT----1MOPR(20)-2----*----3----*----4----*----5----*----6----*----7----*----8\n")
+    f.write("00021004\n")
+    f.write("----*----1 MOP: 123456789*123456789*1234 ---*----5----*----6----*----7----*----8\n")
+
+    f.write("PARAM----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
+    line_param1 = f"{8:>8}{50:>8}{2000:>4} 00000010  4   0500"
+    f.write(line_param1 + "\n")
+    
+    t_max, delten, t_step = 3.1558e9, -1.0, 1.0e-5
+    s_tmax = fmt_10char(t_max)
+    s_delten = fmt_10char(delten)
+    s_tstep = fmt_10char(t_step)
+    
+    line_param2 = f"          {s_tmax}{s_delten}{s_tstep}A1 50 0.01      9.81"
+    f.write(line_param2 + "\n")
+    
+    f.write(" 1.\n")
+    f.write(" 1.E-4     1.E00\n")
+    f.write("             200.e5               .06               1.e-12               75.\n")
+    
+    f.write("TIMES----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
+    f.write("    2\n")
+    f.write(f"{fmt_10char(1.5779e8)} {fmt_10char(3.1558e9)}\n")
+
+    # 9. GENER (Empty)
+    f.write("GENER----1----*----2----*----3----*----4----*----5----*----6----*----7----*----8\n")
+    # No data lines
+    f.write("\n")
+
+    f.write("ENDCY\n")
+print("Done.")

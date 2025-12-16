@@ -1,0 +1,37 @@
+# Title
+'TOUGHREACT 3D CO2 Injection'
+#ISPIA,itersfa,ISOLVC,NGAMM,NGAS1,ichdump,kcpl,Ico2h2o,nu
+    2    0    5    1    1    0    1    0    0
+#constraints for chemical solver
+   1.00e-5   0.000     6.0     1.0
+#Read input and output file names:
+TherAkin10.dat                 ! thermodynamic database
+iter.out                       ! iteration information
+co2d_conc.tec                  ! aqueous concentrations
+co2d_min.tec                   ! mineral data
+co2d_gas.tec                   ! gas data
+co2d_tim.out                   ! time concentrations
+#Weighting parameters
+       1.0       1.0   1.0d-09   1.1d-05
+#data to convergence criteria:
+    1 0.100E-03  200 0.100E-05 0.100E-07  0.00E-05  0.00E-05
+#NWTI NWNOD NWCOM NWMIN NWAQ NWADS NWEXC iconflag minflag  igasflag
+  100    0   13    4   13    0    0    0    1    1
+#pointer of nodes for writing in time:
+
+#pointer of components:
+1  2  3  4  5  6  7  8  9  10  11  12  13
+#pointer of minerals:
+1  2  3  4
+#Individual aqueous species:
+1  2  3  4  5  6  7  8  9  10  11  12  13
+#Adsorption species:
+
+#Exchange species:
+
+#IZIWDF ... (default zones)
+    1    1    1    1    0    0    1    0    0
+#ELEM(a5) ... (specific nodes)
+
+# end record
+end

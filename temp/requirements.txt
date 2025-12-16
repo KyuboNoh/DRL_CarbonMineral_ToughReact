@@ -1,0 +1,6 @@
+python3.12
+libgfortran5
+
+toughio 
+numpy 
+pandas
