@@ -80,3 +80,5 @@
       MTRXIN   1.1      10 September 2000      Routine for Z-preprocessing of the Jacobian
       VISGAS   1.1       8 August    2005      VISCOSITY OF CO2 AS FUNCTION OF TEMPERATURE AND PRESSURE
       CO2SAT   1.0       8 August    2002      interpolate CO2 properties along saturation line
+      WRIFI    1.2      30 November   2015      AT THE COMPLETION OF A TOUGH2 RUN, WRITE PRIMARY VARIABLES ON FILE *SAVE*
+      WRITE_RESTART 2.1  17 September 2013      Write restart data for reactive chemical transport

@@ -1,0 +1,8 @@
+.agent
+.git
+.TOUGHREACT/treactv413omp_eco2n_linux
+.venv/
+.temp/
+*.log
+outputs/
+
